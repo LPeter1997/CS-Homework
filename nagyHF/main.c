@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <ctype.h>
 #include <SDL.h>
 #include "loader.h"
 #include "game_state.h"
@@ -53,6 +54,7 @@ int main(void)
 		gsm_push(menu_create(), renderer);
 		while (running)
 		{
+			keyboard.typed = false;
 			while (SDL_PollEvent(&event))
 			{
 				switch (event.type)
@@ -71,6 +73,22 @@ int main(void)
 
 				case SDL_MOUSEBUTTONUP:
 					mouse.current_state = false;
+					break;
+
+				case SDL_KEYDOWN:
+					keyboard.typed = true;
+					switch (event.key.keysym.sym)
+					{
+					case SDLK_BACKSPACE:
+						keyboard.last_typed = '\r';
+						break;
+					}
+
+				case SDL_TEXTINPUT:
+					if (isprint(event.text.text[0]))
+					{
+						keyboard.last_typed = event.text.text[0];
+					}
 					break;
 				}
 			}

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include "loader.h"
@@ -91,4 +92,34 @@ SDL_Texture* loader_font2text(const char* text, TTF_Font* fnt, SDL_Color col, SD
 	}
 	SDL_FreeSurface(surf);
 	return texture;
+}
+
+fontatlas* loader_fontatlas(TTF_Font* fnt, SDL_Renderer* renderer)
+{
+	SDL_Color col = { 0xff, 0xff, 0xff, 0xff };
+	fontatlas* atlas = (fontatlas*)malloc(sizeof(fontatlas));
+	atlas->pt = TTF_FontHeight(fnt);
+	size_t i;
+	char buf[2] = " ";
+	buf[1] = '\0';
+	for (i = 0; i < ATLAS_LEN; i++)
+	{
+		buf[0] = ATLAS_CHARS[i];
+		glyph gl;
+		gl.texture = loader_font2text(buf, fnt, col, renderer);
+		SDL_QueryTexture(gl.texture, NULL, NULL, &gl.w, &gl.h);
+		atlas->chars[i] = gl;
+	}
+
+	return atlas;
+}
+
+void loader_fontatlas_u(fontatlas* fnt)
+{
+	size_t i;
+	for (i = 0; i < ATLAS_LEN; i++)
+	{
+		loader_texture_u(fnt->chars[i].texture);
+	}
+	free(fnt);
 }

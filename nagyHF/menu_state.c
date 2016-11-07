@@ -1,6 +1,7 @@
 #include "menu_state.h"
 #include "button.h"
 #include "loader.h"
+#include "mapsize_state.h"
 
 #define BUTTON_CNT 2
 
@@ -10,6 +11,7 @@ SDL_Texture* background;
 static void menu_newlvl(void);
 static void menu_lodlvl(void);
 
+static void* renderer_save;
 game_state menu_create(void)
 {
 	game_state st;
@@ -22,6 +24,7 @@ game_state menu_create(void)
 
 void menu_init(void* renderer)
 {
+	renderer_save = renderer;
 	background = loader_texture("izse.png", renderer);
 	TTF_Font* fnt = loader_font("arial.ttf", 48);
 	SDL_Color white = { 0xff, 0xff, 0xff, 0xff };
@@ -59,6 +62,8 @@ void menu_render(void* renderer)
 	{
 		button_render(&buttons[i], renderer);
 	}
+
+	SDL_Color col = { 0x0, 0xff, 0x0, 0xff };
 }
 
 void menu_terminate(void)
@@ -73,7 +78,7 @@ void menu_terminate(void)
 
 static void menu_newlvl(void)
 {
-	printf("New\n");
+	gsm_push(mapsize_create(), renderer_save);
 }
 
 static void menu_lodlvl(void)

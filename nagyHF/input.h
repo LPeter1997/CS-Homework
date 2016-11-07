@@ -13,4 +13,10 @@ struct
 	bool released		: 1;
 } mouse;
 
+struct
+{
+	char last_typed;
+	bool typed;
+} keyboard;
+
 #endif
