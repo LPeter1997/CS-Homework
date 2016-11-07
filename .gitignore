@@ -81,3 +81,13 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+*.suo
+*.ilk
+*.tlog
+*.opendb
+*.db
+*.log
+*.filters
+*.user
+*.pdb
+*.idb
