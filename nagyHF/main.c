@@ -76,10 +76,10 @@ int main(void)
 					break;
 
 				case SDL_KEYDOWN:
-					keyboard.typed = true;
 					switch (event.key.keysym.sym)
 					{
 					case SDLK_BACKSPACE:
+						keyboard.typed = true;
 						keyboard.last_typed = '\r';
 						break;
 					}
@@ -87,6 +87,7 @@ int main(void)
 				case SDL_TEXTINPUT:
 					if (isprint(event.text.text[0]))
 					{
+						keyboard.typed = true;
 						keyboard.last_typed = event.text.text[0];
 					}
 					break;

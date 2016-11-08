@@ -16,6 +16,8 @@ typedef struct
 typedef struct
 {
 	size_t pt;
+	size_t w;
+	size_t h;
 	glyph chars[ATLAS_LEN];
 } fontatlas;
 

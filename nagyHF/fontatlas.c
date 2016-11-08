@@ -11,6 +11,8 @@ void atlas_drawn(fontatlas* atlas, size_t x, size_t y,
 {
 	char* at = text;
 	SDL_Rect rect = { x, y, 0, 0 };
+	atlas->w = 0;
+	atlas->h = 0;
 	while (n--)
 	{
 		char curr = *at++;
@@ -18,6 +20,7 @@ void atlas_drawn(fontatlas* atlas, size_t x, size_t y,
 		{
 			rect.x = x;
 			rect.y += atlas->pt;
+			atlas->h += atlas->pt;
 		}
 		else
 		{
@@ -28,6 +31,7 @@ void atlas_drawn(fontatlas* atlas, size_t x, size_t y,
 			rect.h = g.h;
 			SDL_RenderCopy(renderer, g.texture, NULL, &rect);
 			rect.x += g.w;
+			atlas->w += g.w;
 		}
 	}
 }
