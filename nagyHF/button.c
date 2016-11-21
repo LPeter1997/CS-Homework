@@ -12,12 +12,18 @@ void button_create(button* b, SDL_Rect sz, SDL_Color norm, SDL_Color hil, SDL_Co
 	b->action = cb;
 	b->active = false;
 	b->clicked = false;
+	b->blocked = false;
 }
 
 void button_render(button* b, SDL_Renderer* renderer)
 {
 	SDL_Color col;
-	if (b->active)
+	if (b->blocked)
+	{
+		SDL_Color grey = { 0xaa, 0xaa, 0xaa, 0xff };
+		col = grey;
+	}
+	else if (b->active)
 	{
 		if (b->clicked)
 		{
@@ -44,6 +50,9 @@ void button_render(button* b, SDL_Renderer* renderer)
 
 void button_update(button* b)
 {
+	if (b->blocked)
+		return;
+
 	size_t mx = mouse.x;
 	size_t my = mouse.y;
 	size_t x1 = b->bounds.x;

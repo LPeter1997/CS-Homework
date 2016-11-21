@@ -7,6 +7,8 @@
 #include "game_state.h"
 #include "menu_state.h"
 #include "input.h"
+#include "window.h"
+#undef main
 
 SDL_Window* window;
 SDL_Surface* surface;
@@ -48,7 +50,7 @@ int main(void)
 		return 0;
 	}
 
-	if (create_window("Bounce MapEditor", 960, 540))
+	if (create_window("Bounce MapEditor", WIND_W, WIND_H))
 	{
 		running = true;
 		gsm_push(menu_create(), renderer);

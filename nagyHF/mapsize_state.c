@@ -3,6 +3,7 @@
 #include "textfield.h"
 #include "loader.h"
 #include "button.h"
+#include "mapedit_state.h"
 
 #define BUTTON_CNT 2
 
@@ -13,9 +14,25 @@ static SDL_Texture* height_l;
 static fontatlas* fieldatl;
 static TTF_Font* fieldfont;
 static button buttons[BUTTON_CNT];
+static SDL_Renderer* renderer_save;
 
-static void ms_create(void) {}
+static void ms_create(void);
 static void ms_back(void);
+
+static bool is_num(char c)
+{
+	return c >= '0' && c <= '9';
+}
+
+static char* trim_null(char* str)
+{
+	char* p = str;
+	while (*p == '0')
+	{
+		p++;
+	}
+	return p;
+}
 
 game_state mapsize_create(void)
 {
@@ -29,14 +46,16 @@ game_state mapsize_create(void)
 
 void mapsize_init(void* renderer)
 {
+	renderer_save = renderer;
+
 	SDL_Color white = { 0xff, 0xff, 0xff, 0xff };
 	fieldfont = loader_font("arial.ttf", 32);
 	fieldatl = loader_fontatlas(fieldfont, renderer);
 
-	textfield_create(&width_f, 210, 200, fieldatl, 8);
+	textfield_create(&width_f, 210, 200, fieldatl, 8, is_num);
 	width_l = loader_font2text("Width:", fieldfont, white, renderer);
 	
-	textfield_create(&height_f, 210, 250, fieldatl, 8);
+	textfield_create(&height_f, 210, 250, fieldatl, 8, is_num);
 	height_l = loader_font2text("Height:", fieldfont, white, renderer);
 
 	textfield_activate(&width_f);
@@ -60,6 +79,9 @@ void mapsize_update(void)
 	size_t i = 0;
 	textfield_update(&width_f);
 	textfield_update(&height_f);
+
+	bool blck = !(SDL_strlen(trim_null(width_f.buffer.data)) && SDL_strlen(trim_null(height_f.buffer.data)));
+	buttons[0].blocked = blck;
 
 	for (i = 0; i < BUTTON_CNT; i++)
 	{
@@ -100,6 +122,15 @@ void mapsize_terminate(void)
 	loader_fontatlas_u(fieldatl);
 	loader_texture_u(width_l);
 	loader_font_u(fieldfont);
+}
+
+static void ms_create(void)
+{
+	me_initializer init;
+	init.renderer = renderer_save;
+	init.w = SDL_atoi(width_f.buffer.data);
+	init.h = SDL_atoi(height_f.buffer.data);
+	gsm_push(mapedit_create(), &init);
 }
 
 static void ms_back(void)

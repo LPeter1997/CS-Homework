@@ -17,6 +17,7 @@ typedef struct
 	bool active;
 	bool clicked;
 	callback action;
+	bool blocked;
 } button;
 
 void button_create(button*, SDL_Rect, SDL_Color, SDL_Color, SDL_Color, SDL_Texture*, callback);

@@ -3,6 +3,12 @@
 
 #include "game_state.h"
 
+typedef struct
+{
+	size_t w, h;
+	void* renderer;
+} me_initializer;
+
 game_state mapedit_create(void);
 void mapedit_init(void*);
 void mapedit_update(void);

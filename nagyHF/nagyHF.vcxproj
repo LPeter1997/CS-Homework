@@ -123,6 +123,7 @@
     <ClCompile Include="game_state.c" />
     <ClCompile Include="loader.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="map.c" />
     <ClCompile Include="mapedit_state.c" />
     <ClCompile Include="mapsize_state.c" />
     <ClCompile Include="menu_state.c" />
@@ -135,11 +136,14 @@
     <ClInclude Include="game_state.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="loader.h" />
+    <ClInclude Include="map.h" />
     <ClInclude Include="mapedit_state.h" />
     <ClInclude Include="mapsize_state.h" />
     <ClInclude Include="menu_state.h" />
     <ClInclude Include="str.h" />
     <ClInclude Include="textfield.h" />
+    <ClInclude Include="tile.h" />
+    <ClInclude Include="window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

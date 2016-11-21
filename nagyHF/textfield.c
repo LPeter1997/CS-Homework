@@ -6,13 +6,14 @@
 
 static uint32_t cur_tick;
 
-void textfield_create(textfield* tf, size_t x, size_t y, fontatlas* fnt, size_t sz)
+void textfield_create(textfield* tf, size_t x, size_t y, fontatlas* fnt, size_t sz, validator val)
 {
 	string_new(&tf->buffer, sz);
 	tf->font = fnt;
 	SDL_Rect rec = { x, y, (fnt->pt * sz) * 2 / 3 + 20, sz + 30 };
 	tf->bounds = rec;
 	tf->active = false;
+	tf->valid = val;
 }
 
 void textfield_del(textfield* tf)
@@ -54,7 +55,7 @@ void textfield_update(textfield* tf)
 				break;
 
 			default:
-				if (tf->buffer.len < tf->buffer.reserved - 1)
+				if (tf->buffer.len < tf->buffer.reserved - 1 && tf->valid(keyboard.last_typed))
 				{
 					string_addc(&tf->buffer, keyboard.last_typed);
 				}
