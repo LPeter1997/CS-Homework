@@ -38,6 +38,7 @@ int main(void)
 {
 	bool running;
 	SDL_Event event;
+	size_t i;
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
@@ -53,7 +54,19 @@ int main(void)
 	if (create_window("Bounce MapEditor", WIND_W, WIND_H))
 	{
 		running = true;
+		for (i = 0; i < __MB_Cnt__; i++)
+		{
+			mouse.buttons[i].current_state = false;
+			mouse.buttons[i].last_state = false;
+		}
+		for (i = 0; i < __KP_Cnt__; i++)
+		{
+			keyboard.keys[i].current_state = false;
+			keyboard.keys[i].last_state = false;
+		}
+
 		gsm_push(menu_create(), renderer);
+
 		while (running)
 		{
 			keyboard.typed = false;
@@ -70,21 +83,83 @@ int main(void)
 					break;
 
 				case SDL_MOUSEBUTTONDOWN:
-					mouse.current_state = true;
+					if (event.button.button == SDL_BUTTON_LEFT)
+					{
+						mouse.buttons[MB_Left].current_state = true;
+					}
+					else
+					{
+						mouse.buttons[MB_Right].current_state = true;
+					}
 					break;
 
 				case SDL_MOUSEBUTTONUP:
-					mouse.current_state = false;
+					if (event.button.button == SDL_BUTTON_LEFT)
+					{
+						mouse.buttons[MB_Left].current_state = false;
+					}
+					else
+					{
+						mouse.buttons[MB_Right].current_state = false;
+					}
 					break;
 
 				case SDL_KEYDOWN:
 					switch (event.key.keysym.sym)
 					{
+					case SDLK_LEFT:
+						keyboard.keys[KP_Left].current_state = true;
+						break;
+
+					case SDLK_RIGHT:
+						keyboard.keys[KP_Right].current_state = true;
+						break;
+
+					case SDLK_UP:
+						keyboard.keys[KP_Up].current_state = true;
+						break;
+
+					case SDLK_DOWN:
+						keyboard.keys[KP_Down].current_state = true;
+						break;
+
+					case SDLK_LSHIFT:
+					case SDLK_RSHIFT:
+						keyboard.keys[KP_Shift].current_state = true;
+						break;
+
 					case SDLK_BACKSPACE:
 						keyboard.typed = true;
 						keyboard.last_typed = '\r';
 						break;
 					}
+					break;
+
+				case SDL_KEYUP:
+					switch (event.key.keysym.sym)
+					{
+					case SDLK_LEFT:
+						keyboard.keys[KP_Left].current_state = false;
+						break;
+
+					case SDLK_RIGHT:
+						keyboard.keys[KP_Right].current_state = false;
+						break;
+
+					case SDLK_UP:
+						keyboard.keys[KP_Up].current_state = false;
+						break;
+
+					case SDLK_DOWN:
+						keyboard.keys[KP_Down].current_state = false;
+						break;
+
+					case SDLK_LSHIFT:
+					case SDLK_RSHIFT:
+						keyboard.keys[KP_Shift].current_state = false;
+						break;
+					}
+					break;
 
 				case SDL_TEXTINPUT:
 					if (isprint(event.text.text[0]))
@@ -95,10 +170,19 @@ int main(void)
 					break;
 				}
 			}
-			mouse.released = (mouse.last_state && !mouse.current_state);
-			mouse.pressed = (!mouse.last_state && mouse.current_state);
-			mouse.last_state = mouse.current_state;
 
+			for (i = 0; i < __MB_Cnt__; i++)
+			{
+				mouse.buttons[i].released = (mouse.buttons[i].last_state && !mouse.buttons[i].current_state);
+				mouse.buttons[i].pressed = (!mouse.buttons[i].last_state && mouse.buttons[i].current_state);
+				mouse.buttons[i].last_state = mouse.buttons[i].current_state;
+			}
+			for (i = 0; i < __KP_Cnt__; i++)
+			{
+				keyboard.keys[i].released = (keyboard.keys[i].last_state && !keyboard.keys[i].current_state);
+				keyboard.keys[i].pressed = (!keyboard.keys[i].last_state && keyboard.keys[i].current_state);
+				keyboard.keys[i].last_state = keyboard.keys[i].current_state;
+			}
 			SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 			SDL_RenderClear(renderer);
 

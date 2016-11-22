@@ -61,15 +61,15 @@ void button_update(button* b)
 	size_t y2 = y1 + b->bounds.h;
 
 	b->active = (mx >= x1 && mx < x2 && my >= y1 && my < y2);
-	if (b->active && b->clicked && mouse.released)
+	if (b->active && b->clicked && mouse.buttons[MB_Left].released)
 	{
 		b->action();
 	}
-	else if (b->active && mouse.pressed)
+	else if (b->active && mouse.buttons[MB_Left].pressed)
 	{
 		b->clicked = true;
 	}
-	else if (!mouse.current_state)
+	else if (!mouse.buttons[MB_Left].current_state)
 	{
 		b->clicked = false;
 	}

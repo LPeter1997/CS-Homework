@@ -63,7 +63,7 @@ void textfield_update(textfield* tf)
 		}
 	}
 
-	if (mouse.pressed)
+	if (mouse.buttons[MB_Left].pressed)
 	{
 		size_t mx = mouse.x;
 		size_t my = mouse.y;

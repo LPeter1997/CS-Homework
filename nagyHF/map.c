@@ -8,23 +8,22 @@ void map_create(map* m, size_t w, size_t h)
 	size_t i;
 	m->width = w;
 	m->height = h;
+	m->xoff = 0;
+	m->yoff = 0;
+	m->selx = -1;
+	m->sely = -1;
 	m->grid = (TileID**)malloc(sizeof(TileID*) * w);
 	for (i = 0; i < w; i++)
 	{
 		m->grid[i] = (TileID*)malloc(sizeof(TileID) * h);
-		memset(m->grid[i], T_Air, h);
-	}
-
-	for (i = 0; i < w * h; i++)
-	{
-		m->grid[i % w][i / h] = i % 3 == 0 ? T_Ground : T_Air;
+		memset(m->grid[i], T_Air, h * sizeof(TileID));
 	}
 }
 
-void map_offset_by(map* m, size_t x, size_t y)
+void map_offset_by(map* m, int x, int y)
 {
-	int newx = m->xoff + x;
-	int newy = m->yoff + y;
+	int newx = (int)m->xoff + x;
+	int newy = (int)m->yoff + y;
 	newx = newx < 0 ? 0 : newx;
 	newy = newy < 0 ? 0 : newy;
 	int maxx = m->width * TILE_SIZE - WIND_W;
@@ -68,5 +67,47 @@ void map_render(map* m, SDL_Renderer* renderer)
 			SDL_Rect rec = { x * TILE_SIZE - offx, y * TILE_SIZE - offy, TILE_SIZE, TILE_SIZE };
 			SDL_RenderFillRect(renderer, &rec);
 		}
+	}
+
+	// Draw the grid
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xff);
+	for (y = 0; y < yl; y++)
+	{
+		SDL_RenderDrawLine(renderer, 0, y * TILE_SIZE - offy, WIND_W, y * TILE_SIZE - offy);
+	}
+	for (x = 0; x < xl; x++)
+	{
+		SDL_RenderDrawLine(renderer, x * TILE_SIZE - offx, 0, x * TILE_SIZE - offx, WIND_H);
+	}
+
+	// Draw selected
+	SDL_SetRenderDrawColor(renderer, 0xff, 0, 0, 0xff);
+	if (m->selx >= 0 && m->sely >= 0 && m->selx < m->width && m->sely < m->height)
+	{
+		SDL_Rect rec = { m->selx * TILE_SIZE - offx, m->sely * TILE_SIZE - offy, TILE_SIZE, TILE_SIZE };
+		SDL_Rect r1 = { rec.x, rec.y, rec.w, 5 };
+		SDL_RenderFillRect(renderer, &r1);
+		SDL_Rect r2 = { rec.x, rec.y + rec.h, rec.w, -5 };
+		SDL_RenderFillRect(renderer, &r2);
+		SDL_Rect r3 = { rec.x, rec.y, 5, rec.h };
+		SDL_RenderFillRect(renderer, &r3);
+		SDL_Rect r4 = { rec.x + rec.w, rec.y, -5, rec.h };
+		SDL_RenderFillRect(renderer, &r4);
+	}
+}
+
+void map_sel(map* m, int x, int y)
+{
+	m->selx = (x + m->xoff % TILE_SIZE) / TILE_SIZE;
+	m->sely = (y + m->yoff % TILE_SIZE) / TILE_SIZE;
+}
+
+void map_plot(map* m, TileID t)
+{
+	size_t SX = m->selx + (m->xoff / TILE_SIZE);
+	size_t SY = m->sely + (m->yoff / TILE_SIZE);
+	if (SX >= 0 && SY >= 0 && SX < m->width && SY < m->height)
+	{
+		m->grid[SX][SY] = t;
 	}
 }
