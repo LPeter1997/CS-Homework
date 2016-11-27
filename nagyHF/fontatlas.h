@@ -3,7 +3,7 @@
 
 #include <SDL.h>
 
-#define ATLAS_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .:,;3-*/<>()|"
+#define ATLAS_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .:,;3-*/<>()|_"
 #define ATLAS_LEN (sizeof(ATLAS_CHARS) - 1)
 
 typedef struct

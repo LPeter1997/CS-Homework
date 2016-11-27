@@ -121,6 +121,7 @@
     <ClCompile Include="button.c" />
     <ClCompile Include="fontatlas.c" />
     <ClCompile Include="game_state.c" />
+    <ClCompile Include="grid_selector.c" />
     <ClCompile Include="loader.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="map.c" />
@@ -129,11 +130,13 @@
     <ClCompile Include="menu_state.c" />
     <ClCompile Include="str.c" />
     <ClCompile Include="textfield.c" />
+    <ClCompile Include="tile.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="button.h" />
     <ClInclude Include="fontatlas.h" />
     <ClInclude Include="game_state.h" />
+    <ClInclude Include="grid_selector.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="loader.h" />
     <ClInclude Include="map.h" />

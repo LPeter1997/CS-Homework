@@ -10,10 +10,11 @@ void textfield_create(textfield* tf, size_t x, size_t y, fontatlas* fnt, size_t 
 {
 	string_new(&tf->buffer, sz);
 	tf->font = fnt;
-	SDL_Rect rec = { x, y, (fnt->pt * sz) * 2 / 3 + 20, sz + 30 };
+	SDL_Rect rec = { x, y, (fnt->pt * sz) * 2 / 3 + 20, fnt->pt + 3 };
 	tf->bounds = rec;
 	tf->active = false;
 	tf->valid = val;
+	tf->readonly = false;
 }
 
 void textfield_del(textfield* tf)
@@ -34,7 +35,7 @@ void textfield_draw(textfield* tf, SDL_Renderer* renderer)
 		SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0xff);
 		SDL_RenderDrawLine(renderer, 
 			tf->bounds.x + fa->w + 15, tf->bounds.y + 5, 
-			tf->bounds.x + fa->w + 15, tf->bounds.y + tf->bounds.h - 5);
+			tf->bounds.x + fa->w + 15, tf->bounds.y + tf->bounds.h - 3);
 	}
 }
 
@@ -71,14 +72,17 @@ void textfield_update(textfield* tf)
 		size_t y1 = tf->bounds.y;
 		size_t x2 = x1 + tf->bounds.w;
 		size_t y2 = y1 + tf->bounds.h;
-		tf->active = (mx >= x1 && my >= y1 && mx < x2 && my < y2);
+		tf->active = (mx >= x1 && my >= y1 && mx < x2 && my < y2) && !tf->readonly;
 	}
 }
 
 void textfield_activate(textfield* tf)
 {
-	SDL_StartTextInput();
-	tf->active = true;
+	if (!tf->readonly)
+	{
+		SDL_StartTextInput();
+		tf->active = true;
+	}
 }
 
 void textfield_deactivate(textfield* tf)

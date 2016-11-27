@@ -13,11 +13,16 @@ void map_create(map* m, size_t w, size_t h)
 	m->yoff = 0;
 	m->selx = -1;
 	m->sely = -1;
-	m->grid = (TileID**)malloc(sizeof(TileID*) * w);
+	m->layers_head = (layer*)malloc(sizeof(layer));
+	m->current_layer = m->layers_head;
+	m->current_layer->prev = NULL;
+	m->current_layer->next = NULL;
+
+	m->current_layer->grid = (TileID**)malloc(sizeof(TileID*) * w);
 	for (i = 0; i < w; i++)
 	{
-		m->grid[i] = (TileID*)malloc(sizeof(TileID) * h);
-		memset(m->grid[i], T_Air, h * sizeof(TileID));
+		m->current_layer->grid[i] = (TileID*)malloc(sizeof(TileID) * h);
+		memset(m->current_layer->grid[i], T_Air, h * sizeof(TileID));
 	}
 }
 
@@ -39,35 +44,47 @@ void map_offset_by(map* m, int x, int y)
 
 void map_render(map* m, SDL_Renderer* renderer)
 {
-	size_t xp = m->xoff / TILE_SIZE;
-	size_t yp = m->yoff / TILE_SIZE;
-	size_t offx = m->xoff % TILE_SIZE;
-	size_t offy = m->yoff % TILE_SIZE;
+	size_t x, y;
 	size_t xl = WIND_W / TILE_SIZE + 1;
 	size_t yl = WIND_H / TILE_SIZE + 2;
-	size_t x, y;
-	size_t xa, ya;
-	TileID tid;
-	for (y = 0; y < yl; y++)
+	size_t offx = m->xoff % TILE_SIZE;
+	size_t offy = m->yoff % TILE_SIZE;
+	layer* lay = m->layers_head;
+	// Render bg
+	SDL_Rect bgr = { 0, 0, WIND_W - HUD_WIDTH, WIND_H };
+	SDL_SetRenderDrawColor(renderer, 0xaa, 0xaa, 0xff, 0xff);
+	SDL_RenderFillRect(renderer, &bgr);
+	while (lay)
 	{
-		ya = yp + y;
-		if (ya >= m->height) continue;
-		for (x = 0; x < xl; x++)
+		size_t xp = m->xoff / TILE_SIZE;
+		size_t yp = m->yoff / TILE_SIZE;
+		size_t xa, ya;
+		TileID tid;
+		size_t alpha = 0x55;
+		if (lay == m->current_layer)
 		{
-			xa = xp + x;
-			if (xa >= m->width) continue;
-			tid = m->grid[xa][ya];
-			if (tid == T_Air)
-			{
-				SDL_SetRenderDrawColor(renderer, 0x66, 0x66, 0xff, 0xff);
-			}
-			else
-			{
-				SDL_SetRenderDrawColor(renderer, 0xcc, 0xdd, 0x44, 0xff);
-			}
-			SDL_Rect rec = { x * TILE_SIZE - offx, y * TILE_SIZE - offy, TILE_SIZE, TILE_SIZE };
-			SDL_RenderFillRect(renderer, &rec);
+			alpha = 0xff;
 		}
+		for (y = 0; y < yl; y++)
+		{
+			ya = yp + y;
+			if (ya >= m->height) continue;
+			for (x = 0; x < xl; x++)
+			{
+				xa = xp + x;
+				if (xa >= m->width) continue;
+				tid = lay->grid[xa][ya];
+				SDL_Texture* tex = TEX_LOOKUP[tid];
+				SDL_Rect rec = { x * TILE_SIZE - offx, y * TILE_SIZE - offy, TILE_SIZE, TILE_SIZE };
+				if (tex)
+				{
+					SDL_SetTextureAlphaMod(tex, alpha);
+					SDL_RenderCopy(renderer, tex, NULL, &rec);
+					SDL_SetTextureAlphaMod(tex, 0xff);
+				}
+			}
+		}
+		lay = lay->next;
 	}
 
 	// Draw the grid
@@ -109,6 +126,26 @@ void map_plot(map* m, TileID t)
 	size_t SY = m->sely + (m->yoff / TILE_SIZE);
 	if (SX >= 0 && SY >= 0 && SX < m->width && SY < m->height)
 	{
-		m->grid[SX][SY] = t;
+		m->current_layer->grid[SX][SY] = t;
+	}
+}
+
+void map_add_layer(map* m)
+{
+	size_t i;
+	layer* tmp = m->current_layer->next;
+	m->current_layer->next = (TileID**)malloc(sizeof(TileID*) * m->width);
+	m->current_layer->next->grid = (TileID**)malloc(sizeof(TileID*) * m->width);
+	for (i = 0; i < m->width; i++)
+	{
+		m->current_layer->next->grid[i] = (TileID*)malloc(sizeof(TileID) * m->height);
+		memset(m->current_layer->next->grid[i], T_Air, m->height * sizeof(TileID));
+	}
+	m->current_layer->next->prev = m->current_layer;
+	m->current_layer = m->current_layer->next;
+	m->current_layer->next = tmp;
+	if (tmp)
+	{
+		tmp->prev = m->current_layer;
 	}
 }

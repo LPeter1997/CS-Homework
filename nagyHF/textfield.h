@@ -13,6 +13,7 @@ typedef struct
 	string buffer;
 	fontatlas* font;
 	bool active;
+	bool readonly;
 	validator valid;
 } textfield;
 

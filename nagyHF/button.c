@@ -4,6 +4,7 @@
 void button_create(button* b, SDL_Rect sz, SDL_Color norm, SDL_Color hil, SDL_Color pr,
 	SDL_Texture* lb, callback cb)
 {
+	b->l_bounds.w = 0;
 	b->bounds = sz;
 	b->normal_color = norm;
 	b->hilight_color = hil;
@@ -13,6 +14,7 @@ void button_create(button* b, SDL_Rect sz, SDL_Color norm, SDL_Color hil, SDL_Co
 	b->active = false;
 	b->clicked = false;
 	b->blocked = false;
+	b->userdata = NULL;
 }
 
 void button_render(button* b, SDL_Renderer* renderer)
@@ -40,12 +42,19 @@ void button_render(button* b, SDL_Renderer* renderer)
 	}
 	SDL_SetRenderDrawColor(renderer, col.r, col.g, col.b, col.a);
 	SDL_RenderFillRect(renderer, &b->bounds);
-	size_t w, h;
-	SDL_QueryTexture(b->label, NULL, NULL, &w, &h);
-	size_t diffx = b->bounds.w - w;
-	size_t diffy = b->bounds.h - h;
-	SDL_Rect lpos = { b->bounds.x + diffx / 2, b->bounds.y + diffy / 2, w, h };
-	SDL_RenderCopy(renderer, b->label, NULL, &lpos);
+	if (b->l_bounds.w && b->label)
+	{
+		SDL_RenderCopy(renderer, b->label, NULL, &b->l_bounds);
+	}
+	else if (b->label)
+	{
+		size_t w, h;
+		SDL_QueryTexture(b->label, NULL, NULL, &w, &h);
+		size_t diffx = b->bounds.w - w;
+		size_t diffy = b->bounds.h - h;
+		SDL_Rect lpos = { b->bounds.x + diffx / 2, b->bounds.y + diffy / 2, w, h };
+		SDL_RenderCopy(renderer, b->label, NULL, &lpos);
+	}
 }
 
 void button_update(button* b)
@@ -63,7 +72,7 @@ void button_update(button* b)
 	b->active = (mx >= x1 && mx < x2 && my >= y1 && my < y2);
 	if (b->active && b->clicked && mouse.buttons[MB_Left].released)
 	{
-		b->action();
+		b->action(b);
 	}
 	else if (b->active && mouse.buttons[MB_Left].pressed)
 	{
