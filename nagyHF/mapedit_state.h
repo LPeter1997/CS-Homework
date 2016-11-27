@@ -2,6 +2,7 @@
 #define __MAPEDIT_ST_H__
 
 #include "game_state.h"
+#define HUD_WIDTH 300
 
 typedef struct
 {

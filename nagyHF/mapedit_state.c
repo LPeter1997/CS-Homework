@@ -1,6 +1,7 @@
 #include "mapedit_state.h"
 #include "map.h"
 #include "input.h"
+#include "window.h"
 
 static map mmap;
 
@@ -22,7 +23,7 @@ void mapedit_init(void* userptr)
 
 void mapedit_update(void)
 {
-	if (SDL_GetTicks() % 10 == 0)
+	if (SDL_GetTicks() % 4 == 0)
 	{
 		int dx = 0;
 		int dy = 0;
@@ -35,35 +36,46 @@ void mapedit_update(void)
 		map_offset_by(&mmap, dx, dy);
 	}
 
-	if (keyboard.keys[KP_Shift].current_state)
+	if (mouse.x < WIND_W - HUD_WIDTH)
 	{
-		if (mouse.buttons[MB_Left].current_state)
+		if (keyboard.keys[KP_Shift].current_state)
 		{
-			map_plot(&mmap, T_Ground);
+			if (mouse.buttons[MB_Left].current_state)
+			{
+				map_plot(&mmap, T_Ground);
+			}
+			else if (mouse.buttons[MB_Right].current_state)
+			{
+				map_plot(&mmap, T_Air);
+			}
 		}
-		else if (mouse.buttons[MB_Right].current_state)
+		else
 		{
-			map_plot(&mmap, T_Air);
+			if (mouse.buttons[MB_Left].released)
+			{
+				map_plot(&mmap, T_Ground);
+			}
+			else if (mouse.buttons[MB_Right].released)
+			{
+				map_plot(&mmap, T_Air);
+			}
 		}
+
+		map_sel(&mmap, mouse.x, mouse.y);
 	}
 	else
 	{
-		if (mouse.buttons[MB_Left].released)
-		{
-			map_plot(&mmap, T_Ground);
-		}
-		else if (mouse.buttons[MB_Right].released)
-		{
-			map_plot(&mmap, T_Air);
-		}
+		map_sel(&mmap, -1, -1);
 	}
-
-	map_sel(&mmap, mouse.x, mouse.y);
 }
 
 void mapedit_render(void* renderer)
 {
 	map_render(&mmap, renderer);
+	SDL_SetRenderDrawColor(renderer, 0x44, 0x44, 0x44, 0xff);
+	SDL_Rect rect = { WIND_W - HUD_WIDTH, 0, HUD_WIDTH, WIND_H };
+	SDL_RenderFillRect(renderer, &rect);
+
 }
 
 void mapedit_terminate(void)

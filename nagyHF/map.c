@@ -2,6 +2,7 @@
 #include <string.h>
 #include "map.h"
 #include "window.h"
+#include "mapedit_state.h"
 
 void map_create(map* m, size_t w, size_t h)
 {
@@ -26,7 +27,7 @@ void map_offset_by(map* m, int x, int y)
 	int newy = (int)m->yoff + y;
 	newx = newx < 0 ? 0 : newx;
 	newy = newy < 0 ? 0 : newy;
-	int maxx = m->width * TILE_SIZE - WIND_W;
+	int maxx = m->width * TILE_SIZE - WIND_W + HUD_WIDTH;
 	int maxy = m->height * TILE_SIZE - WIND_H;
 	maxx = maxx < 0 ? 0 : maxx;
 	maxy = maxy < 0 ? 0 : maxy;
@@ -73,7 +74,7 @@ void map_render(map* m, SDL_Renderer* renderer)
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xff);
 	for (y = 0; y < yl; y++)
 	{
-		SDL_RenderDrawLine(renderer, 0, y * TILE_SIZE - offy, WIND_W, y * TILE_SIZE - offy);
+		SDL_RenderDrawLine(renderer, 0, y * TILE_SIZE - offy, WIND_W - HUD_WIDTH, y * TILE_SIZE - offy);
 	}
 	for (x = 0; x < xl; x++)
 	{
